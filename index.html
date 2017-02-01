@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  <head>
+</head>
+  <body>
+	<div class="container" style="text-align: center">
+	<alert></alert>
+    <h1 style="text-align: center">Thermo-Magic</h1><br><br>
+	<h3>Current Temp:<span id="CurrentTemp">Loading</span></h3>
+	<div class="row">
+		<div class="col-sm-3 col-sm-offset-3">
+		Current Setting:<div id="CurrentDesiredTemp">Loading</div>
+		<input type="text" class="form-control" placeholder="Desired Temp" name="DesiredTemp" id="DesiredTempId">
+		</div>
+		<div class="col-sm-3">
+		Eco Factor:<div id="CurrentEcoFactor">Loading</div>
+		<input type="text" class="form-control" placeholder="Eco Factor"name="EcoFactor" id="EcoFactorId">
+		</div>
+	</div>
+	<br>
+	<div class="col-sm-2 col-sm-offset-5">
+	<select name="SystemMode" class="form-control" id="SystemModeId">
+		<option value="Auto">Auto</option>
+		<option value="Heat">Heat</option>
+		<option value="Cool">Cool</option>
+		<option value="Fan">Fan</option>
+		<option value="Off">Off</option>
+	</select>
+	</div>
+    
+
+    <br><br>
+    
+	<button type="button" id="thebutton" onclick="DoTheMagic()" class="btn btn-primary">Primary</button>
+    <br><br>
+    </div>
+
+    <script type="text/javascript">
+      var deviceID    = "YOUR DEVICE ID HERE";
+      var accessToken = "YOUR TOKEN HERE";
+	  
+	  requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + "DesiredTemp" + "/?access_token=" + accessToken;
+		$.getJSON(requestURL, function(json) {
+                 document.getElementById("CurrentDesiredTemp").innerHTML = parseInt(json.result);
+                 });
+	  requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + "CurrentTemp" + "/?access_token=" + accessToken;
+		$.getJSON(requestURL, function(json) {
+                 document.getElementById("CurrentTemp").innerHTML = parseInt(json.result);
+                 });
+	  requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + "EcoFactor" + "/?access_token=" + accessToken;
+		$.getJSON(requestURL, function(json) {
+                 document.getElementById("CurrentEcoFactor").innerHTML = parseInt(json.result);
+                 });
+	  requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + "SystemMode" + "/?access_token=" + accessToken;
+		$.getJSON(requestURL, function(json) {
+                 document.getElementById("SystemModeId").value = json.result;
+                 });
+		
+      function DoTheMagic() {
+	if (document.getElementById("DesiredTempId").value == ""  ||  document.getElementById("EcoFactorId").value == ""){
+
+	$("alert").append('  <div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">×</a> <strong>HEY!</strong> You better fill in dem boxes!  </div>')
+	} else{
+	document.getElementById("CurrentDesiredTemp").innerHTML = document.getElementById("DesiredTempId").value;
+	document.getElementById("CurrentEcoFactor").innerHTML = document.getElementById("EcoFactorId").value;
+	var requestURL = "https://api.spark.io/v1/devices/" +deviceID + "/" + "DesiredTemp" + "/";
+	var requestURL2 = "https://api.spark.io/v1/devices/" +deviceID + "/" + "EcoFactor" + "/";
+	var requestURL3 = "https://api.spark.io/v1/devices/" +deviceID + "/" + "SystemMode" + "/";
+        $.post( requestURL, { params: document.getElementById("DesiredTempId").value, access_token: accessToken });
+		$.post( requestURL2, { params: document.getElementById("EcoFactorId").value, access_token: accessToken });
+		$.post( requestURL3, { params: document.getElementById("SystemModeId").value, access_token: accessToken });
+	$("alert").append('  <div id="success-alert" class="alert alert-success alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">×</a><strong>Success!</strong> Now performing the Thermo-Magic</div>')
+	$("#success-alert").fadeTo(4000, 500).fadeOut(500, function(){
+		$("#success-alert").slideUp(500);
+	});
+      }
+	}
+    </script>
+</body>
+</html>
